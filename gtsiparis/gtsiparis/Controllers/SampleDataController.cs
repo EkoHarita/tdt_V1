@@ -28,7 +28,7 @@ namespace gtsiparis.Controllers
                 {
                     DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
                     TemperatureC = rng.Next(-20, 55),
-                    Summary = kategoriList[rng.Next(kategoriList.Length)].Ad
+                    Summary = kategoriList[index].Ad
                 });
             }
             catch (Exception e)
