@@ -8,10 +8,12 @@ namespace gtsiparis.Data.Model
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public string Ad { get; set; }
         public bool Aktif { get; set; }
         
+        public int GrupId { get; set; }
         [Required]
-        public virtual Grup Grup { get; set; }
+        public Grup Grup { get; set; }
     }
 }

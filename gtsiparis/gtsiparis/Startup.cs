@@ -36,7 +36,7 @@ namespace gtsiparis
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
+                options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequiredUniqueChars = 6;
 
@@ -63,11 +63,13 @@ namespace gtsiparis
                 options.SlidingExpiration = true;
             });
             
+            services.AddTransient<Bootstrap>();
+            
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, Bootstrap bootstrap)
         {
             if (env.IsDevelopment())
             {
@@ -81,6 +83,8 @@ namespace gtsiparis
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+            
+            bootstrap.SeedData(app);
 
             app.UseStaticFiles();
             

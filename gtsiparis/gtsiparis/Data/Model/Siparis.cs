@@ -12,13 +12,16 @@ namespace gtsiparis.Data.Model
         [Key]
         public int Id { get; set; }
 
+        [Required]
         [Column(TypeName = "datetime2")]
         public DateTime Tarih { get; set; }
 
-        public virtual string KullaniciId { get; set; }
+        public string KullaniciId { get; set; }
+
+        public int GrupId { get; set; }
+        [Required]
+        public Grup Grup { get; set; }
         
-        public virtual Grup Grup { get; set; }
-        
-        public virtual ICollection<SiparisKalemi> SiparisKalemleri { get; set; }
+        public ICollection<SiparisKalemi> SiparisKalemleri { get; set; }
     }
 }

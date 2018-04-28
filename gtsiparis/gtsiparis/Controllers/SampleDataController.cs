@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using gtsiparis.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +11,6 @@ namespace gtsiparis.Controllers
     {
         private readonly TdtDbContext _dbContext;
 
-        private static string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         public SampleDataController(TdtDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -25,24 +19,23 @@ namespace gtsiparis.Controllers
         [HttpGet("[action]")]
         public IEnumerable<WeatherForecast> WeatherForecasts()
         {
-
             try
             {
-                var list = _dbContext.Grup.ToArray();
+                var kategoriList = _dbContext.Kategori.ToArray();
+                
+                var rng = new Random();
+                return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+                {
+                    DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
+                    TemperatureC = rng.Next(-20, 55),
+                    Summary = kategoriList[rng.Next(kategoriList.Length)].Ad
+                });
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
-            
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            });
         }
 
         public class WeatherForecast

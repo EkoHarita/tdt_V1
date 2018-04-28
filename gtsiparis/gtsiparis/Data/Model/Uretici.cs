@@ -15,6 +15,6 @@ namespace gtsiparis.Data.Model
         public string Mahalle { get; set; }
         public string PostaKodu { get; set; }
         public string Mobile { get; set; }
-        public virtual Grup Grup { get; set; }
+        public Grup Grup { get; set; }
     }
 }

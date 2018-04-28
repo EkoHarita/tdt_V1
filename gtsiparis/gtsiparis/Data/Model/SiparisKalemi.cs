@@ -8,10 +8,13 @@ namespace gtsiparis.Data.Model
     {
         [Key]
         public int Id { get; set; }
+        [Required]
         public decimal Miktar { get; set; }
         public decimal Tutar { get; set; }
         public decimal BirimFiyat { get; set; }
-        public virtual Siparis Siparis { get; set; }
-        public virtual Urun Urun { get; set; }
+        [Required]
+        public Siparis Siparis { get; set; }
+        [Required]
+        public Urun Urun { get; set; }
     }
 }
