@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "name": "my_new_app"
+    "name": "TDT V1"
   },
   "apps": [
     {
