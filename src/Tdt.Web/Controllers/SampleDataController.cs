@@ -22,15 +22,9 @@ namespace my_new_app.Controllers
         {
             try
             {
-                var kategoriList = _dbContext.Kategori.ToArray();
-                
-                var rng = new Random();
-                return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-                {
-                    DateFormatted = DateTime.Now.AddDays(index).ToString("d"),
-                    TemperatureC = rng.Next(-20, 55),
-                    Summary = kategoriList[index].Ad
-                });
+                var kategoriList = _dbContext.Kategori.Select(x=> new WeatherForecast{Summary = x.Ad}).ToArray();
+
+                return kategoriList;
             }
             catch (Exception e)
             {
