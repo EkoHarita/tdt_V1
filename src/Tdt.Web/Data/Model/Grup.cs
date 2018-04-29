@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace gtsiparis.Data.Model
+namespace Tdt.Web.Data.Model
 {
     [Table("tdt.Grup")]
     public class Grup

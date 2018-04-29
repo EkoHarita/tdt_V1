@@ -1,8 +1,8 @@
-﻿using gtsiparis.Data;
-using gtsiparis.Data.Model;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Tdt.Web.Data;
+using Tdt.Web.Data.Model;
 
-namespace gtsiparis.Controllers
+namespace Tdt.Web.Controllers
 {
     [Route("api/[controller]")]
     public class GrupController : Controller

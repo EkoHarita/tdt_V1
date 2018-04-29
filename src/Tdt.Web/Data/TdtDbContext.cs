@@ -1,10 +1,11 @@
-using gtsiparis.Data.Model;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Tdt.Web.Data.Model;
 
-namespace gtsiparis.Data
+namespace Tdt.Web.Data
 {
-    public class TdtDbContext : IdentityDbContext<ApplicationUser>
+    public class TdtDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public DbSet<Birim> Birim { get; set; }
         public DbSet<Kategori> Kategori { get; set; }

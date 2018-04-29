@@ -1,6 +1,6 @@
 using System;
 
-namespace gtsiparis.Data
+namespace Tdt.Web.Data
 {
     internal static class Roles
     {

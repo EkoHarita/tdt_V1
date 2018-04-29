@@ -1,49 +1,45 @@
 using System.Threading.Tasks;
-using gtsiparis.Data.Model;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.Extensions.DependencyInjection;
+using Tdt.Web.Data.Model;
 
-namespace gtsiparis.Data
+namespace Tdt.Web.Data
 {
     public class Bootstrap
     {
+        private readonly TdtDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public Bootstrap(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public Bootstrap(TdtDbContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
+            _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
         }
 
-        public async void SeedData(IApplicationBuilder applicationBuilder)
+        public async Task SeedAsync()
         {
-            InitializeDatabase(applicationBuilder);
+            await InitializeDatabase();
             await SeedRoles();
             await SeedUsers();
 
-            await SeedDomain(applicationBuilder);
+            await SeedDomain();
         }
         
-        private static async Task SeedDomain(IApplicationBuilder applicationBuilder)
+        private async Task SeedDomain()
         {
-            using (var scope = applicationBuilder.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<TdtDbContext>();
-                if (context.Grup.Any()) return;
+            if (_dbContext.Grup.Any()) return;
                 
-                var grup = await CreateGrup(context);
-                await CreateBirim(context, grup);
-                await CreateKategori(context, grup);
+            var grup = await CreateGrup();
+            await CreateBirim(grup);
+            await CreateKategori(grup);
 
-                await context.SaveChangesAsync();
-            }
+            await _dbContext.SaveChangesAsync();
         }
 
-        private static async Task CreateKategori(TdtDbContext context, Grup grup)
+        private async Task CreateKategori(Grup grup)
         {
             var kategori = new[]
             {
@@ -65,7 +61,7 @@ namespace gtsiparis.Data
             
             for (var i = 0; i < kategori.Length; i++)
             {
-                await context.Kategori.AddAsync(new Kategori
+                await _dbContext.Kategori.AddAsync(new Kategori
                 {
                     Id = i + 1,
                     Ad = kategori[i],
@@ -75,7 +71,7 @@ namespace gtsiparis.Data
             }
         }
 
-        private static async Task<Grup> CreateGrup(TdtDbContext context)
+        private async Task<Grup> CreateGrup()
         {
             var grup = new Grup
             {
@@ -88,17 +84,17 @@ namespace gtsiparis.Data
                 PostaKodu = "34750"
             };
             
-            await context.Grup.AddAsync(grup);
+            await _dbContext.Grup.AddAsync(grup);
 
             return grup;
         }
 
-        private static async Task CreateBirim(TdtDbContext context, Grup grup)
+        private async Task CreateBirim(Grup grup)
         {
-            await context.Birim.AddAsync(new Birim{ Id = 1, Ad = "Kg", Grup = grup});
-            await context.Birim.AddAsync(new Birim{ Id = 2, Ad = "Lt", Grup = grup});
-            await context.Birim.AddAsync(new Birim{ Id = 3, Ad = "Adet", Grup = grup});
-            await context.Birim.AddAsync(new Birim{ Id = 4, Ad = "Demet", Grup = grup});
+            await _dbContext.Birim.AddAsync(new Birim{ Id = 1, Ad = "Kg", Grup = grup});
+            await _dbContext.Birim.AddAsync(new Birim{ Id = 2, Ad = "Lt", Grup = grup});
+            await _dbContext.Birim.AddAsync(new Birim{ Id = 3, Ad = "Adet", Grup = grup});
+            await _dbContext.Birim.AddAsync(new Birim{ Id = 4, Ad = "Demet", Grup = grup});
         }
 
         private async Task SeedUsers()
@@ -117,7 +113,8 @@ namespace gtsiparis.Data
                     Email = email,
                     Ad = "Eko",
                     Soyad = "Topluluk",
-                    SecurityStamp = "secure"
+                    SecurityStamp = "secure",
+                    EmailConfirmed = true
                 };
 
                 await _userManager.CreateAsync(user, "3k0t0pluluk!");
@@ -134,12 +131,9 @@ namespace gtsiparis.Data
                 await _roleManager.CreateAsync(new IdentityRole(Roles.Administrator));
         }
 
-        private static void InitializeDatabase(IApplicationBuilder applicationBuilder)
+        private async Task InitializeDatabase()
         {
-            using (var scope = applicationBuilder.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                scope.ServiceProvider.GetRequiredService<TdtDbContext>().Database.Migrate();
-            }
+            await _dbContext.Database.MigrateAsync().ConfigureAwait(false);
         }
     }
 }

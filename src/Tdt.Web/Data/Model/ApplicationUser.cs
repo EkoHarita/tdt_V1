@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace gtsiparis.Data.Model
+namespace Tdt.Web.Data.Model
 {
     public class ApplicationUser : IdentityUser
     {
