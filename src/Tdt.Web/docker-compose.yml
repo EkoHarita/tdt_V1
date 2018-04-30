@@ -1,0 +1,19 @@
+version: '2'
+services:
+  test:
+    image: rancher/lb-service-haproxy:v0.7.15
+    ports:
+    - 80:80/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin,agent
+      io.rancher.container.agent_service.drain_provider: 'true'
+      io.rancher.container.create_agent: 'true'
+  web:
+    image: registry.gitlab.com/ekoharita/tdt/v1:develop
+    stdin_open: true
+    tty: true
+    ports:
+    - 5000:5000/tcp
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label: env=development

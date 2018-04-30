@@ -1,0 +1,18 @@
+<div class="container mt-5">
+<h1>Kategoriler</h1>
+
+<p *ngIf="!forecasts"><em>Loading...</em></p>
+
+<table class='table' *ngIf="forecasts">
+  <thead>
+    <tr>
+      <th>Kategori</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let forecast of forecasts">
+      <td>{{ forecast.summary }}</td>
+    </tr>
+  </tbody>
+</table>
+</div>

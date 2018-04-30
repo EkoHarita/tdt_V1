@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{731E5375-A87C-4F69-9DE6-F63B6983A330}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tdt.Web", "src\Tdt.Web\Tdt.Web.csproj", "{A93FA866-80D5-4C24-BBEA-AD531EC3171B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A93FA866-80D5-4C24-BBEA-AD531EC3171B} = {731E5375-A87C-4F69-9DE6-F63B6983A330}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A93FA866-80D5-4C24-BBEA-AD531EC3171B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A93FA866-80D5-4C24-BBEA-AD531EC3171B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A93FA866-80D5-4C24-BBEA-AD531EC3171B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A93FA866-80D5-4C24-BBEA-AD531EC3171B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
