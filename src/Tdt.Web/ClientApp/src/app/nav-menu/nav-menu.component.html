@@ -15,6 +15,19 @@
       <li class="nav-item">
         <a [routerLink]='["/fetch-data"]' class="nav-link">Data</a>
       </li>
+      <li *ngIf="!isUserLoggedIn" class="nav-item">
+        <a [routerLink]='["/login"]' class="nav-link">Giriş</a></li>
     </ul>
+    <div *ngIf="isUserLoggedIn" class="app-component collapse navbar-collapse menuItemsContainer">
+      <ul class="app-component nav navbar-nav nav-pills navBarPadding">
+        <li routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"><a routerLink=""><span class="glyphicon glyphicon-home"></span></a></li>
+      </ul>
+      <ul class="app-component nav navbar-nav nav-pills navBarPadding navbar-right">
+        <li (click)="logout()" class="nav-item"><a href="javascript:;" class="nav-link"><span class="glyphicon glyphicon-log-out"></span> Çıkış</a></li>
+      </ul>
+      <ul class="app-component nav navbar-nav nav-pills navBarPadding navbar-right">
+        <li routerLinkActive="active"><a routerLink="/settings"><span class="glyphicon glyphicon-cog"></span></a></li>
+      </ul>
+    </div>
   </div>
 </nav>
