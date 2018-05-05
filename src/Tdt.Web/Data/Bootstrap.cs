@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Tdt.Web.Core;
 using Tdt.Web.Data.Model;
 
 namespace Tdt.Web.Data
@@ -127,8 +129,16 @@ namespace Tdt.Web.Data
             if (!await _roleManager.RoleExistsAsync(Roles.Default))
                 await _roleManager.CreateAsync(new IdentityRole(Roles.Default));
 
+            var adminRole = new IdentityRole(Roles.Administrator);
             if (!await _roleManager.RoleExistsAsync(Roles.Administrator))
-                await _roleManager.CreateAsync(new IdentityRole(Roles.Administrator));
+                await _roleManager.CreateAsync(adminRole);
+            
+            adminRole = await _roleManager.FindByNameAsync(adminRole.Name);
+
+            foreach (var claim in ApplicationPermissions.GetAdministrativePermissionValues())
+            {
+                await _roleManager.AddClaimAsync(adminRole, new Claim(CustomClaimTypes.Permission, ApplicationPermissions.GetPermissionByValue(claim)));
+            }
         }
 
         private async Task InitializeDatabase()

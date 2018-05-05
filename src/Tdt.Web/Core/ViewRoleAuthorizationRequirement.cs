@@ -20,7 +20,7 @@ namespace Tdt.Web.Core
             if (context.User == null)
                 return Task.CompletedTask;
 
-            if (context.User.HasClaim("permission", ApplicationPermissions.ViewRoles) || context.User.IsInRole(roleName))
+            if (context.User.HasClaim(CustomClaimTypes.Permission, ApplicationPermissions.ViewRoles) || context.User.IsInRole(roleName))
                 context.Succeed(requirement);
 
             return Task.CompletedTask;

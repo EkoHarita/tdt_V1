@@ -19,7 +19,7 @@ using Tdt.Web.ViewModels;
 
 namespace Tdt.Web.Controllers
 {
-    
+    [Authorize(AuthenticationSchemes = OAuthValidationDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     public class AccountController : Controller
     {
@@ -34,7 +34,6 @@ namespace Tdt.Web.Controllers
             _authorizationService = authorizationService;
         }
 
-        [Authorize(AuthenticationSchemes = OAuthValidationDefaults.AuthenticationScheme)]
         [HttpGet("users/me")]
         [Produces(typeof(UserViewModel))]
         public async Task<IActionResult> GetCurrentUser()
@@ -46,8 +45,8 @@ namespace Tdt.Web.Controllers
         [Produces(typeof(UserViewModel))]
         public async Task<IActionResult> GetUserById(string id)
         {
-//            if (!(await _authorizationService.AuthorizeAsync(this.User, id, AccountManagementOperations.Read)).Succeeded)
-//                return new ChallengeResult();
+            if (!(await _authorizationService.AuthorizeAsync(this.User, id, AccountManagementOperations.Read)).Succeeded)
+                return new ChallengeResult();
 
 
             UserViewModel userVM = await GetUserViewModelHelper(id);
@@ -64,8 +63,8 @@ namespace Tdt.Web.Controllers
         {
             ApplicationUser appUser = await _accountManager.GetUserByUserNameAsync(userName);
 
-//            if (!(await _authorizationService.AuthorizeAsync(this.User, appUser?.Id ?? "", AccountManagementOperations.Read)).Succeeded)
-//                return new ChallengeResult();
+            if (!(await _authorizationService.AuthorizeAsync(this.User, appUser?.Id ?? "", AccountManagementOperations.Read)).Succeeded)
+                return new ChallengeResult();
 
             if (appUser == null)
                 return NotFound(userName);

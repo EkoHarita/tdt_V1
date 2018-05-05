@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using AspNet.Security.OpenIdConnect.Primitives;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Tdt.Web.Core;
@@ -119,12 +118,12 @@ namespace Tdt.Web
             
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(Policies.ViewAllUsersPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ViewUsers));
-                options.AddPolicy(Policies.ManageAllUsersPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ManageUsers));
+                options.AddPolicy(Policies.ViewAllUsersPolicy, policy => policy.RequireClaim(CustomClaimTypes.Permission, ApplicationPermissions.ViewUsers));
+                options.AddPolicy(Policies.ManageAllUsersPolicy, policy => policy.RequireClaim(CustomClaimTypes.Permission, ApplicationPermissions.ManageUsers));
 
-                options.AddPolicy(Policies.ViewAllRolesPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ViewRoles));
+                options.AddPolicy(Policies.ViewAllRolesPolicy, policy => policy.RequireClaim(CustomClaimTypes.Permission, ApplicationPermissions.ViewRoles));
                 options.AddPolicy(Policies.ViewRoleByRoleNamePolicy, policy => policy.Requirements.Add(new ViewRoleAuthorizationRequirement()));
-                options.AddPolicy(Policies.ManageAllRolesPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ManageRoles));
+                options.AddPolicy(Policies.ManageAllRolesPolicy, policy => policy.RequireClaim(CustomClaimTypes.Permission, ApplicationPermissions.ManageRoles));
 
                 options.AddPolicy(Policies.AssignAllowedRolesPolicy, policy => policy.Requirements.Add(new AssignRolesAuthorizationRequirement()));
             });
@@ -135,7 +134,12 @@ namespace Tdt.Web
             });
             
             services.AddTransient<Bootstrap>();
-            services.AddScoped<IAccountManager, AccountManager>();           
+            services.AddScoped<IAccountManager, AccountManager>();  
+            // Auth Handlers
+            services.AddSingleton<IAuthorizationHandler, ViewUserAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, ManageUserAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, ViewRoleAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, AssignRolesAuthorizationHandler>();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

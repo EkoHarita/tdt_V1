@@ -26,9 +26,9 @@ namespace Tdt.Web.Core
             {
                 context.Succeed(requirement);
             }
-            else if (context.User.HasClaim("permission", ApplicationPermissions.AssignRoles))
+            else if (context.User.HasClaim(CustomClaimTypes.Permission, ApplicationPermissions.AssignRoles))
             {
-                if (context.User.HasClaim("permission", ApplicationPermissions.ViewRoles)) // If user has ViewRoles permission, then he can assign any roles
+                if (context.User.HasClaim(CustomClaimTypes.Permission, ApplicationPermissions.ViewRoles)) // If user has ViewRoles permission, then he can assign any roles
                     context.Succeed(requirement);
 
                 else if (GetIsUserInAllAddedRoles(context.User, newAndCurrentRoles.Item1, newAndCurrentRoles.Item2)) // Else user can only assign roles they're part of
