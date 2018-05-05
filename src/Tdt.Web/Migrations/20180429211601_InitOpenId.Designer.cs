@@ -10,9 +10,10 @@ using Tdt.Web.Data;
 namespace Tdt.Web.Migrations
 {
     [DbContext(typeof(TdtDbContext))]
-    partial class TdtDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180429211601_InitOpenId")]
+    partial class InitOpenId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

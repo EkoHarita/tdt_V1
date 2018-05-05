@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using AspNet.Security.OpenIdConnect.Primitives;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -5,7 +9,10 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Tdt.Web.Core;
 using Tdt.Web.Data;
 using Tdt.Web.Data.Model;
 
@@ -23,14 +30,23 @@ namespace Tdt.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
+            services.AddMvc();
+            
             services.AddDbContext<TdtDbContext>(options =>
-                options.UseSqlite("Data Source=tdt.db", b => b.MigrationsAssembly("Tdt.Web")));
+                {
+                    options.UseSqlite("Data Source=tdt.db", b => b.MigrationsAssembly("Tdt.Web"));
+                    options.UseOpenIddict();
+                });
             
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<TdtDbContext>()
                 .AddDefaultTokenProviders();
             
             // Configure Identity options and password complexity here
+            // Configure Identity to use the same JWT claims as OpenIddict instead
+            // of the legacy WS-Federation claims it uses by default (ClaimTypes),
+            // which saves you from doing the mapping in your authorization controller.
             services.Configure<IdentityOptions>(options =>
             {
                 // User settings
@@ -47,21 +63,79 @@ namespace Tdt.Web
                 //    //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
                 //    //options.Lockout.MaxFailedAccessAttempts = 10;
 
-//                options.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
-//                options.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
-//                options.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+                options.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
+                options.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
+                options.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+            });
+
+            // Register the OpenIddict services.
+            services.AddOpenIddict(options =>
+            {
+                // Register the Entity Framework stores.
+                options.AddEntityFrameworkCoreStores<TdtDbContext>();
+
+                // Register the ASP.NET Core MVC binder used by OpenIddict.
+                // Note: if you don't call this method, you won't be able to
+                // bind OpenIdConnectRequest or OpenIdConnectResponse parameters.
+                options.AddMvcBinders();
+
+                // Enable the token endpoint.
+                options.EnableTokenEndpoint("/connect/token");
+
+                // Enable the password and the refresh token flows.
+                options.AllowPasswordFlow()
+                    .AllowRefreshTokenFlow();
+
+                // During development, you can disable the HTTPS requirement.
+                options.DisableHttpsRequirement();
+
+                // Note: to use JWT access tokens instead of the default
+                // encrypted format, the following lines are required:
+//                options.UseJsonWebTokens();
+//                options.AddEphemeralSigningKey();
+            });
+
+            services.AddAuthentication()
+                .AddOAuthValidation();
+            
+            // If you prefer using JWT, don't forget to disable the automatic
+            // JWT -> WS-Federation claims mapping used by the JWT middleware:
+            
+//             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+//             JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
+//            
+//             services.AddAuthentication()
+//                 .AddJwtBearer(options =>
+//                 {
+//                     options.Authority = "http://localhost:5000/";
+//                     options.Audience = "resource_server";
+//                     options.RequireHttpsMetadata = false;
+//                     options.TokenValidationParameters = new TokenValidationParameters
+//                     {
+//                         NameClaimType = OpenIdConnectConstants.Claims.Subject,
+//                         RoleClaimType = OpenIdConnectConstants.Claims.Role
+//                     };
+//                 });
+            
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Policies.ViewAllUsersPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ViewUsers));
+                options.AddPolicy(Policies.ManageAllUsersPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ManageUsers));
+
+                options.AddPolicy(Policies.ViewAllRolesPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ViewRoles));
+                options.AddPolicy(Policies.ViewRoleByRoleNamePolicy, policy => policy.Requirements.Add(new ViewRoleAuthorizationRequirement()));
+                options.AddPolicy(Policies.ManageAllRolesPolicy, policy => policy.RequireClaim("permission", ApplicationPermissions.ManageRoles));
+
+                options.AddPolicy(Policies.AssignAllowedRolesPolicy, policy => policy.Requirements.Add(new AssignRolesAuthorizationRequirement()));
             });
             
-            services.AddAuthentication(options =>
+            Mapper.Initialize(cfg =>
             {
-//                options.DefaultAuthenticateScheme = OAuthValidationDefaults.AuthenticationScheme;
-//                options.DefaultChallengeScheme = OAuthValidationDefaults.AuthenticationScheme;
-            });//.AddOAuthValidation();
+                cfg.AddProfile<AutoMapperProfile>();
+            });
             
             services.AddTransient<Bootstrap>();
-            
-            services.AddCors();
-            services.AddMvc();
+            services.AddScoped<IAccountManager, AccountManager>();           
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -93,6 +167,23 @@ namespace Tdt.Web
                     Flow = "password",
                     TokenUrl = "/connect/token"
                 });
+                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                {
+                    In = "header",
+                    Description = "Please insert JWT with Bearer into field",
+                    Name = "Authorization",
+                    Type = "apiKey"
+                });
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer", new string[] { } }
+                });
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "oauth2", new string[] { } }
+                });
+
+                c.DocumentFilter<SecurityRequirementsDocumentFilter>();
             });
         }
 
@@ -142,6 +233,21 @@ namespace Tdt.Web
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+        }
+    }
+    
+    public class SecurityRequirementsDocumentFilter : IDocumentFilter
+    {
+        public void Apply(SwaggerDocument document, DocumentFilterContext context)
+        {
+            document.Security = new List<IDictionary<string, IEnumerable<string>>>()
+            {
+                new Dictionary<string, IEnumerable<string>>()
+                {
+                    { "Bearer", new string[]{ } },
+                    { "Basic", new string[]{ } },
+                }
+            };
         }
     }
 }
