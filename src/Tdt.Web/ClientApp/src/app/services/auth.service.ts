@@ -5,7 +5,7 @@ import { Subject } from 'rxjs/Subject';
 import { LocalStoreManager } from './local-store-manager.service';
 import { EndpointFactory } from './endpoint-factory.service';
 import { ConfigurationService } from './configuration.service';
-import { DBkeys } from './db-Keys';
+import { DBkeys } from './db-keys';
 import { Utilities } from './utilities';
 import {JwtHelper} from "./jwt-helper";
 import {LoginResponse, IdToken} from "../models/login-response.model";

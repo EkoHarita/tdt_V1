@@ -116,7 +116,7 @@ namespace Tdt.Web.Data
                     Ad = "Eko",
                     Soyad = "Topluluk",
                     SecurityStamp = "secure",
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
                 };
 
                 await _userManager.CreateAsync(user, "3k0t0pluluk!");
@@ -131,13 +131,16 @@ namespace Tdt.Web.Data
 
             var adminRole = new IdentityRole(Roles.Administrator);
             if (!await _roleManager.RoleExistsAsync(Roles.Administrator))
-                await _roleManager.CreateAsync(adminRole);
-            
-            adminRole = await _roleManager.FindByNameAsync(adminRole.Name);
-
-            foreach (var claim in ApplicationPermissions.GetAdministrativePermissionValues())
             {
-                await _roleManager.AddClaimAsync(adminRole, new Claim(CustomClaimTypes.Permission, ApplicationPermissions.GetPermissionByValue(claim)));
+                await _roleManager.CreateAsync(adminRole);
+
+                adminRole = await _roleManager.FindByNameAsync(adminRole.Name);
+
+                foreach (var claim in ApplicationPermissions.GetAllPermissionValues())
+                {
+                    await _roleManager.AddClaimAsync(adminRole,
+                        new Claim(CustomClaimTypes.Permission, ApplicationPermissions.GetPermissionByValue(claim)));
+                }
             }
         }
 

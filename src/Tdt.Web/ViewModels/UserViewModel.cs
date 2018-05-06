@@ -25,7 +25,7 @@ namespace Tdt.Web.ViewModels
 
         public string Configuration { get; set; }
 
-        public bool IsEnabled { get; set; }
+        public bool IsEnabled => true;
 
         public bool IsLockedOut { get; set; }
 
