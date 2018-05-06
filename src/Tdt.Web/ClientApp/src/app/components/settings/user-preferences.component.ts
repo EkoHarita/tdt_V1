@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 
 import { AlertService, DialogType, MessageSeverity } from '../../services/alert.service';
 import { ConfigurationService } from '../../services/configuration.service';
-import { BootstrapSelectDirective } from "../../directives/bootstrap-select.directive";
 import { AccountService } from '../../services/account.service';
 import { Utilities } from '../../services/utilities';
 
@@ -15,12 +14,6 @@ import { Utilities } from '../../services/utilities';
 export class UserPreferencesComponent implements OnInit, OnDestroy {
 
     themeSelectorToggle = true;
-
-    @ViewChild("languageSelector")
-    languageSelector: BootstrapSelectDirective;
-
-    @ViewChild("homePageSelector")
-    homePageSelector: BootstrapSelectDirective;
 
     constructor(private alertService: AlertService, private accountService: AccountService, public configurations: ConfigurationService) {
     }

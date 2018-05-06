@@ -23,7 +23,6 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
 import { LoginComponent } from './components/login/login.component';
 import {SettingsComponent} from "./components/settings/settings.component";
 import {UserInfoComponent} from "./components/settings/user-info.component";
-import {BootstrapSelectDirective} from "./directives/bootstrap-select.directive";
 import {UserPreferencesComponent} from "./components/settings/user-preferences.component";
 import {UsersManagementComponent} from "./components/settings/users-management.component";
 
@@ -37,8 +36,7 @@ import {UsersManagementComponent} from "./components/settings/users-management.c
     SettingsComponent,
     UserInfoComponent,
     UserPreferencesComponent,
-    UsersManagementComponent,
-    BootstrapSelectDirective
+    UsersManagementComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
